@@ -2,6 +2,7 @@ package main
 
 import (
 	"bwastartup/auth"
+	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
 	"bwastartup/user"
@@ -25,6 +26,23 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
+
+	campaigns, err := campaignRepository.FindByUserID(1)
+
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println(len(campaigns))
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImages) > 0 {
+			fmt.Println("jumlah gambar")
+			fmt.Println(len(campaign.CampaignImages))
+			fmt.Println(campaign.CampaignImages[0].FileName)
+		}
+	}
+
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 
@@ -45,22 +63,22 @@ func main() {
 
 func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
 
-	return func (c *gin.Context) {
+	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
-	
+
 		if !strings.Contains(authHeader, "Bearer") {
 			response := helper.APIResponse("Unauthorize", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
-	
+
 		// Bearer tokentokentoken
 		tokenString := ""
 		arrayToken := strings.Split(authHeader, " ")
 		if len(arrayToken) == 2 {
 			tokenString = arrayToken[1]
 		}
-	
+
 		token, err := authService.ValidateToken(tokenString)
 		if err != nil {
 			response := helper.APIResponse("Unauthorize", http.StatusUnauthorized, "error", nil)
