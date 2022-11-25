@@ -2,6 +2,9 @@ package auth
 
 import (
 	"errors"
+	"os"
+
+	"github.com/subosito/gotenv"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -14,7 +17,11 @@ type Service interface {
 type jwtService struct {
 }
 
-var SECRET_KEY = []byte("SHIROOO_s3cr3T_k3Y")
+func init() {
+	gotenv.Load()
+}
+
+var SECRET_KEY = []byte((os.Getenv("SECRET_KEY_JWT")))
 
 func NewService() *jwtService {
 	return &jwtService{}

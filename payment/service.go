@@ -2,8 +2,9 @@ package payment
 
 import (
 	"bwastartup/user"
+	"os"
 	"strconv"
-
+	"github.com/subosito/gotenv"
 	midtrans "github.com/veritrans/go-midtrans"
 )
 
@@ -14,14 +15,18 @@ type Service interface {
 	GetPaymentURL(transaction Transaction, user user.User) (string, error)
 }
 
+func init() {
+	gotenv.Load()
+}
+
 func NewService() *service {
 	return &service{}
 }
 
 func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string, error) {
 	midclient := midtrans.NewClient()
-	midclient.ServerKey = ""
-	midclient.ClientKey = ""
+	midclient.ServerKey = (os.Getenv("S_Key"))
+	midclient.ClientKey = (os.Getenv("C_Key"))
 	midclient.APIEnvType = midtrans.Sandbox
 
 	snapGateway := midtrans.SnapGateway{
